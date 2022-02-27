@@ -37,22 +37,6 @@ st.dataframe(df.head(3))
 st.write(f" ##### Bottom 3 rows of the dataset")
 st.dataframe(df.tail(3))
 
-# Sidebar
-st.sidebar.markdown("#### Please make your selections from below options")
-if st.sidebar.checkbox("Show independent variables data", False):
-    st.subheader("Independent variables interactive dataframe")
-    st.dataframe(features)
-
-if st.sidebar.checkbox("Show Line plots of Independent variables", False):
-    st.subheader("Independent variables line plots")
-    fig = px.line(features)
-    st.plotly_chart(fig)
-
-if st.sidebar.checkbox(" Show Line plot of  the target variable(Adj Close)", False):
-    st.subheader("Adj Close line plot")
-    fig = px.line(target)
-    st.plotly_chart(fig)
-
 # remember that our testing data set is only for the year 2018
 # and we will use year below 2018 for training
 features = df.drop(columns=['Close','Adj Close'],axis=1)
@@ -150,3 +134,18 @@ if value_to_use_selection != "None":
                        " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
                         "It also means that we  make better predictions")
 
+# Sidebar
+st.sidebar.markdown("#### Please make your selections from below options")
+if st.sidebar.checkbox("Show independent variables data", False):
+    st.subheader("Independent variables interactive dataframe")
+    st.dataframe(features)
+
+if st.sidebar.checkbox("Show Line plots of Independent variables", False):
+    st.subheader("Independent variables line plots")
+    fig = px.line(features)
+    st.plotly_chart(fig)
+
+if st.sidebar.checkbox(" Show Line plot of  the target variable(Adj Close)", False):
+    st.subheader("Adj Close line plot")
+    fig = px.line(target)
+    st.plotly_chart(fig)
