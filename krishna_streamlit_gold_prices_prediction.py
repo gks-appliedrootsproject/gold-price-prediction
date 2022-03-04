@@ -120,19 +120,20 @@ if value_to_use_selection != "None":
             # fig2 =px.line(my_df)
             # st.plotly_chart(fig2)
 
-            st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
-            r2_score_lr = r2_score(y_test,y_pred)
-            rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
-            explained_variance = explained_variance_score(y_test, y_pred)
+            if value_to_use_selection == "Pick a random data point from test set":
+                st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
+                r2_score_lr = r2_score(y_test,y_pred)
+                rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
+                explained_variance = explained_variance_score(y_test, y_pred)
 
-            #code block for above metrics
-            col1,col2,col3 = st.columns(3)
-            col1.metric("The r2 score is",r2_score_lr)
-            col2.metric("RMSE is",rmse_lr)
-            col3.metric("Explained variance is",explained_variance)
-            st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
-                       " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
-                        "It also means that we  make better predictions")
+                #code block for above metrics
+                col1,col2,col3 = st.columns(3)
+                col1.metric("The r2 score is",r2_score_lr)
+                col2.metric("RMSE is",rmse_lr)
+                col3.metric("Explained variance is",explained_variance)
+                st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
+                           " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
+                            "It also means that we  make better predictions")
 
 # Sidebar
 st.sidebar.markdown("#### Please make your selections from below options")
