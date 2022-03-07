@@ -1,23 +1,8 @@
 import pandas as pd
-import plotly.express as px
-import matplotlib.pyplot as plt
-
-import random
-import math
-from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.metrics import *
-
-from sklearn.metrics import explained_variance_score
-from sklearn.metrics import r2_score
-
-import numpy as np # for som math operations
 from sklearn.preprocessing import StandardScaler # for standardizing the Data
-
-from statsmodels.tsa.arima.model import ARIMA,ARIMAResults
-import statsmodels.api as smapi
 
 import joblib
 
@@ -41,6 +26,7 @@ X_test = features[year_2018_index_start:]
 y_train = target[:year_2018_index_start]
 y_test = target[year_2018_index_start:]
 
+# train on only 3 features
 X_train_small = X_train[["Open", "Low", "High"]]
 X_test_small = X_test[["Open", "Low", "High"]]
 
