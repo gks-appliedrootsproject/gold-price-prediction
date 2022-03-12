@@ -20,6 +20,7 @@ from sklearn.preprocessing import StandardScaler # for standardizing the Data
 
 import joblib
 
+
 # Title
 
 st.header("Applied Roots: Gold Prices ML Prediction App")
@@ -53,14 +54,14 @@ y_train = target[:year_2018_index_start]
 y_test = target[year_2018_index_start:]
 
 
-value_to_use_selection = st.radio("What would you like to do? ", ("None", 'Pick a random data point from test set', 'I will pick a date'))
+value_to_use_selection = st.radio("What would you like to do? ", ("None","Enter my own data points", 'Let the system automatically select a random data point from test set','I will pick a date'))
 # If you want to use only 3 features and enter your own values then, please add this to above -->  ,"Enter my own data points"
 
 i = 0
 # uncomment the below 3 lines if you want to use only 3 features
-#custom_open = 0
-#custom_low = 0
-#custom_high = 0
+custom_open = 0
+custom_low = 0
+custom_high = 0
 
 random_date = []
 value_to_predict = 0
@@ -68,7 +69,7 @@ lr_fit = {}
 dectree_fit = {}
 rf_fit = {}
 
-if value_to_use_selection == "Pick a random data point from test set":
+if value_to_use_selection == "Let the system automatically select a random data point from test set":
     # Pick a random date from the test set
     i = random.choice(range(len(X_test)))
     random_date = X_test.iloc[[i]]
@@ -84,89 +85,122 @@ elif value_to_use_selection == "I will pick a date":
 
     st.markdown(" - *Please select a business/work day, **use dates only from the year 2018** and no weekends or Government holidays*" )
     st.markdown(" - *After picking your custom date,* **if you get any error, then please select a valid date** ")
+   
     pick_date = st.date_input( " Pick a date from the test dataset (only from the year 2018 & no weekends or Government holidays)",min_value=date(2018, 1, 2), max_value=date(2018,12,31),value=date(2018,1,2),help=" ## No weekends or Government holidays")
-    custom_date =  X_test.loc[[pick_date]]
-    st.write(f"###### You have picked this date",pick_date, "and shown below is the *independent variables(features) test data*",custom_date)
-
-    value_to_predict = custom_date
-    lr_fit = joblib.load("lr_full.pkl")
-    dectree_fit = joblib.load("dectree_full.pkl")
-    rf_fit = joblib.load("rf_full.pkl")
-
+    st.write(pick_date)
+    
+    if pd.to_datetime(pick_date)  in X_test.index :
+        custom_date =  X_test.loc[[pick_date]]
+        st.write(f"###### You have picked this date",pick_date)
+        st.write(" Here is the test data point(*independent variables/features*) on your picked date",custom_date)
+        value_to_predict = custom_date
+        lr_fit = joblib.load("lr_full.pkl")
+        dectree_fit = joblib.load("dectree_full.pkl")
+        rf_fit = joblib.load("rf_full.pkl")             
+     
+    else:
+        st.warning(" ##### Error: This is not  a valid test date, so please pick any other date (no weekends or government holidays)")
+        
+    
 # uncomment below 10 lines if you want to use only 3 features
-#elif value_to_use_selection == "Enter my own data points":
-    #custom_open = st.number_input("Insert a value for: Open",min_value = 100)
-    #custom_low = st.number_input("Insert a value for: Low",min_value = 100)
-    #custom_high = st.number_input("Insert a value for: High",min_value = 100)
-    #X_train = X_train[["Open", "Low", "High"]]
-    #X_test = X_test[["Open", "Low", "High"]]
-    #value_to_predict = pd.DataFrame([[custom_open, custom_low, custom_high]], columns=["Open", "Low", "High"])
-    #lr_fit = joblib.load("lr_small.pkl")
-    #dectree_fit = joblib.load("dectree_small.pkl")
-    #rf_fit = joblib.load("rf_small.pkl")
+elif value_to_use_selection == "Enter my own data points":
+    custom_open = st.number_input("Insert a value for: Open",min_value = 100.0,step=5.0)
+    custom_low = st.number_input("Insert a value for: Low",min_value = 100.0,step=5.0)
+    custom_high = st.number_input("Insert a value for: High",min_value = 100.0,step=5.0)
+    X_train = X_train[["Open", "Low", "High"]]
+    X_test = X_test[["Open", "Low", "High"]]
+    value_to_predict = pd.DataFrame([[custom_open, custom_low, custom_high]], columns=["Open", "Low", "High"])
+    lr_fit = joblib.load("lr_small.pkl")
+    dectree_fit = joblib.load("dectree_small.pkl")
+    rf_fit = joblib.load("rf_small.pkl")
+
+elif  value_to_use_selection != "None":
+    st.write("")
 
 else:
     st.write("Please make a selection for what value to test with.")
 
 Algorithm = {}
-if value_to_use_selection != "None":
-    Algorithm = st.selectbox( "Pick a Machine Learning  Algorithm:",["None","Linear Regression", "Decision Tree","Random Forest"])
+if value_to_use_selection != "None" :
+
+    Algorithm = st.selectbox( "Pick a Machine Learning  Algorithm:",["None","Linear Regression", "Decision Tree Regression","Random Forest Regression"])
 
     prediction = 0
     y_pred = []
 
-    if Algorithm == "Linear Regression":
+    if Algorithm == "Linear Regression" :
         st.markdown("<h4 style='text-align: center; color: blue;'>Linear Regression  </h4>", unsafe_allow_html=True)
         prediction = lr_fit.predict(value_to_predict)[0]
         y_pred = lr_fit.predict(X_test)
 
-    elif Algorithm == "Decision Tree":
-        st.markdown("<h4 style='text-align: center; color: blue;'>Decision Tree</h4>", unsafe_allow_html=True)
+    elif Algorithm == "Decision Tree Regression":
+        st.markdown("<h4 style='text-align: center; color: blue;'>Decision Tree Regression</h4>", unsafe_allow_html=True)
         prediction = dectree_fit.predict(value_to_predict)[0]
         y_pred = dectree_fit.predict(X_test)
 
-    elif Algorithm == "Random Forest":
-        st.markdown("<h4 style='text-align: center; color: blue;'>Random Forest</h4>", unsafe_allow_html=True)
+    elif Algorithm == "Random Forest Regression":
+        st.markdown("<h4 style='text-align: center; color: blue;'>Random Forest Regression</h4>", unsafe_allow_html=True)
         prediction = rf_fit.predict(value_to_predict)[0]
         y_pred = rf_fit.predict(X_test)
 
+    
     else:
         st.write("#### Pick a Machine Learning Algorithm from the above drop down menu.")
 
 
-    if Algorithm != "None" and value_to_use_selection != "I will pick a date":
-        st.write(f"##### We can make predictions on a random data: ", value_to_predict)
+    if Algorithm != "None" and value_to_use_selection != "I will pick a date" :
+        st.write(f"##### We can make predictions on this data ", value_to_predict)
         if st.button("Predict"):
             # Output prediction
-            st.write(f"#### The predicted Adj Close value is: {prediction}")
-            #my_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+            st.write(f"### `The predicted Adj Close value is:` {prediction}")
+            
+            if value_to_use_selection != "Enter my own data points":
+                st.write(f"### `The actual Adj Close value on` ",random_date.index[0],"is:",y_test.loc[[random_date.index[0]]])
+                my_custom_df1 = pd.DataFrame({'Actual': y_test.loc[[random_date.index[0]]], 'Predicted': prediction})
+                
+                st.markdown("<h4 style='text-align: center; color: blue;'> Actual  vs. Predicted</h4>", unsafe_allow_html=True)
+                fig2 =px.bar(my_custom_df1,barmode='group')
+                fig2.update_xaxes(tickformat="%b %d\n%Y")
+                fig2.update_layout(xaxis_title = "Your Selected Date",yaxis_title = "Adj Close")
+                st.plotly_chart(fig2)
+            
 
-            st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
-            r2_score_lr = r2_score(y_test,y_pred)
-            rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
-            explained_variance = explained_variance_score(y_test, y_pred)
+            
+            
+            # If you want to show metrics then please uncomment the below code block
+            #st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
+            #r2_score_lr = r2_score(y_test,y_pred)
+            #rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
+            #explained_variance = explained_variance_score(y_test, y_pred)
 
             #code block for above metrics
-            col1,col2,col3 = st.columns(3)
-            col1.metric("The r2 score is",r2_score_lr)
-            col2.metric("RMSE is",rmse_lr)
-            col3.metric("Explained variance is",explained_variance)
-            st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
-                       " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
-                        "It also means that we  make better predictions")
+            #col1,col2,col3 = st.columns(3)
+            #col1.metric("The r2 score is",r2_score_lr)
+            #col2.metric("RMSE is",rmse_lr)
+            #col3.metric("Explained variance is",explained_variance)
+            #st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
+            #           " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
+            #           "It also means that we  make better predictions")
 
-    elif  Algorithm == "None" and value_to_use_selection == "Pick a random data point from test set":
+                
+    
+
+    elif  Algorithm == "None" and value_to_use_selection == "Let the system automatically select a random data point from test set":
+        st.write("")
+    
+    elif  Algorithm == "None" and value_to_use_selection == "Enter my own data points":
         st.write("")
 
     elif Algorithm == "None" and value_to_use_selection == "I will pick a date":
         st.write("")
+    
     else:
         st.write(f"##### We will use below selected data point to make prediction: ", value_to_predict)
         if st.button("Predict"):
             # Output prediction
-            st.write(f"#### The predicted Adj Close value is: {prediction}")
+            st.write(f" ### `The predicted Adj Close value is:` {prediction}")
 
-            st.write(f"#### The actual Adj Close value on this date",pick_date,"is",y_test.loc[[pick_date]])
+            st.write(f"### `The actual Adj Close value on` ",pick_date,"is:",y_test.loc[[pick_date]])
             my_custom_df = pd.DataFrame({'Actual': y_test.loc[[pick_date]], 'Predicted': prediction})
 
             st.markdown("<h4 style='text-align: center; color: blue;'> Actual  vs. Predicted</h4>", unsafe_allow_html=True)
