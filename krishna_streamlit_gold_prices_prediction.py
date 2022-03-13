@@ -85,10 +85,10 @@ elif value_to_use_selection == "I will pick a date":
 
     st.markdown(" - *Please select a business/work day, **use dates only from the year 2018** and no weekends or Government holidays*" )
     st.markdown(" - *After picking your custom date,* **if you get any error, then please select a valid date** ")
-   
+
     pick_date = st.date_input( " Pick a date from the test dataset (only from the year 2018 & no weekends or Government holidays)",min_value=date(2018, 1, 2), max_value=date(2018,12,31),value=date(2018,1,2),help=" ## No weekends or Government holidays")
     st.write(pick_date)
-    
+
     if pd.to_datetime(pick_date)  in X_test.index :
         custom_date =  X_test.loc[[pick_date]]
         st.write(f"###### You have picked this date",pick_date)
@@ -96,12 +96,12 @@ elif value_to_use_selection == "I will pick a date":
         value_to_predict = custom_date
         lr_fit = joblib.load("lr_full.pkl")
         dectree_fit = joblib.load("dectree_full.pkl")
-        rf_fit = joblib.load("rf_full.pkl")             
-     
+        rf_fit = joblib.load("rf_full.pkl")
+
     else:
         st.warning(" ##### Error: This is not  a valid test date, so please pick any other date (no weekends or government holidays)")
-        
-    
+
+
 # uncomment below 10 lines if you want to use only 3 features
 elif value_to_use_selection == "Enter my own data points":
     custom_open = st.number_input("Insert a value for: Open",min_value = 100.0,step=5.0)
@@ -143,7 +143,7 @@ if value_to_use_selection != "None" :
         prediction = rf_fit.predict(value_to_predict)[0]
         y_pred = rf_fit.predict(X_test)
 
-    
+
     else:
         st.write("#### Pick a Machine Learning Algorithm from the above drop down menu.")
 
@@ -153,47 +153,45 @@ if value_to_use_selection != "None" :
         if st.button("Predict"):
             # Output prediction
             st.write(f"### `The predicted Adj Close value is:` {prediction}")
-            
+
             if value_to_use_selection != "Enter my own data points":
                 st.write(f"### `The actual Adj Close value on` ",random_date.index[0],"is:",y_test.loc[[random_date.index[0]]])
                 my_custom_df1 = pd.DataFrame({'Actual': y_test.loc[[random_date.index[0]]], 'Predicted': prediction})
-                
+
                 st.markdown("<h4 style='text-align: center; color: blue;'> Actual  vs. Predicted</h4>", unsafe_allow_html=True)
                 fig2 =px.bar(my_custom_df1,barmode='group')
                 fig2.update_xaxes(tickformat="%b %d\n%Y")
                 fig2.update_layout(xaxis_title = "Your Selected Date",yaxis_title = "Adj Close")
                 st.plotly_chart(fig2)
-            
 
-            
-            
-            # If you want to show metrics then please uncomment the below code block
-            #st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
-            #r2_score_lr = r2_score(y_test,y_pred)
-            #rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
-            #explained_variance = explained_variance_score(y_test, y_pred)
 
-            #code block for above metrics
-            #col1,col2,col3 = st.columns(3)
-            #col1.metric("The r2 score is",r2_score_lr)
-            #col2.metric("RMSE is",rmse_lr)
-            #col3.metric("Explained variance is",explained_variance)
-            #st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
-            #           " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
-            #           "It also means that we  make better predictions")
+                # If you want to show metrics then please uncomment the below code block
+                st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
+                r2_score_lr = r2_score(y_test,y_pred)
+                rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
+                explained_variance = explained_variance_score(y_test, y_pred)
 
-                
-    
+                #code block for above metrics
+                col1,col2,col3 = st.columns(3)
+                col1.metric("The r2 score is",r2_score_lr)
+                col2.metric("RMSE is",rmse_lr)
+                col3.metric("Explained variance is",explained_variance)
+                st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
+                           " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
+                           "It also means that we  make better predictions")
+
+
+
 
     elif  Algorithm == "None" and value_to_use_selection == "Let the system automatically select a random data point from test set":
         st.write("")
-    
+
     elif  Algorithm == "None" and value_to_use_selection == "Enter my own data points":
         st.write("")
 
     elif Algorithm == "None" and value_to_use_selection == "I will pick a date":
         st.write("")
-    
+
     else:
         st.write(f"##### We will use below selected data point to make prediction: ", value_to_predict)
         if st.button("Predict"):
@@ -209,6 +207,20 @@ if value_to_use_selection != "None" :
             fig2.update_layout(xaxis_title = "Your Selected Date",yaxis_title = "Adj Close")
             st.plotly_chart(fig2)
 
+            # If you want to show metrics then please uncomment the below code block
+            st.markdown("<h2 style='text-align: center; color: blue;'> Metrics for the model comparing training data set vs. testing data set:</h2>", unsafe_allow_html=True)
+            r2_score_lr = r2_score(y_test,y_pred)
+            rmse_lr = math.sqrt(mean_squared_error( y_true =y_test,y_pred= y_pred))
+            explained_variance = explained_variance_score(y_test, y_pred)
+
+            #code block for above metrics
+            col1,col2,col3 = st.columns(3)
+            col1.metric("The r2 score is",r2_score_lr)
+            col2.metric("RMSE is",rmse_lr)
+            col3.metric("Explained variance is",explained_variance)
+            st.markdown("The best possible explained variance score  is 1.0, lower values are worse.\n"
+                       " If this value is closer to 1 ,then it indicates a stronger strength of association.\n"
+                       "It also means that we  make better predictions")
 
 # Sidebar
 st.sidebar.markdown("#### Please make your selections from below options")
@@ -254,3 +266,4 @@ Instead  of holding physical gold,the investors own small quantities of gold-rel
     Gold Miners ETF :- 'GDX_Open', 'GDX_High', 'GDX_Low', 'GDX_Close', 'GDX_Adj Close', 'GDX_Volume'
     Oil ETF USO :- 'USO_Open','USO_High', 'USO_Low', 'USO_Close', 'USO_Adj Close', 'USO_Volume'
 **Target Variable is:** `Adjusted Close` """,unsafe_allow_html=True)
+
